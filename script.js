@@ -8,32 +8,52 @@ class KittyMeowMachine {
             happy: {
                 image: 'cat-happy.png',
                 meows: ['Meow! 😸', 'Purr meow! 🐾', 'Mrow mrow! ✨', 'Happy meow! 💕'],
-                voicePrompts: ['happy purring cat sound', 'content kitten meowing', 'joyful cat vocalization']
+                soundPrompts: ['happy cat purring and meowing', 'content kitten gentle meow', 'joyful cat soft purr']
             },
             angry: {
                 image: 'cat-angry.png', 
                 meows: ['HISS! 😾', 'Grrr meow! 💢', 'Angry mrow! 🔥', 'Mad cat sounds! 😤'],
-                voicePrompts: ['angry cat hissing', 'grumpy cat growling', 'annoyed feline sounds']
+                soundPrompts: ['angry cat hissing loudly', 'grumpy cat growling and yowling', 'annoyed feline angry meow']
             },
             sleepy: {
                 image: 'cat-sleepy.png',
                 meows: ['Yawn... meow 😴', 'Sleepy purr... 💤', 'Zzz... mrow 🌙', 'Drowsy meow... ☁️'],
-                voicePrompts: ['sleepy cat yawning', 'tired kitten purring', 'drowsy feline sounds']
+                soundPrompts: ['sleepy cat soft yawn and purr', 'tired kitten gentle meow', 'drowsy feline quiet purr']
             },
             hungry: {
                 image: 'cat-hungry.png',
                 meows: ['FEED ME! 🍽️', 'Hungry meow! 🐟', 'Where food? Mrow! 🥫', 'Nom nom meow! 🍖'],
-                voicePrompts: ['demanding hungry cat', 'begging kitten sounds', 'insistent food meowing']
+                soundPrompts: ['demanding hungry cat loud meow', 'begging kitten insistent meowing', 'food-wanting cat persistent calls']
             },
             playful: {
                 image: 'cat-playful.png',
                 meows: ['Play time! 🎾', 'Zoom zoom meow! 💨', 'Catch me! Mrow! 🏃‍♂️', 'Bouncy meow! 🎈'],
-                voicePrompts: ['playful kitten chirping', 'excited cat trilling', 'energetic feline calls']
+                soundPrompts: ['playful kitten excited chirping', 'energetic cat trilling sounds', 'active feline playful meows']
             },
             curious: {
                 image: 'cat-curious.png',
                 meows: ['What\'s that? 🔍', 'Interested mrow? 🤔', 'Tell me more! Meow 📚', 'Curious purr? 💭'],
-                voicePrompts: ['inquisitive cat chirp', 'questioning kitten trill', 'curious feline vocalization']
+                soundPrompts: ['inquisitive cat questioning trill', 'curious kitten soft chirp', 'interested feline gentle meow']
+            },
+            scared: {
+                image: 'cat-scared.png',
+                meows: ['Eek! Meow! 😨', 'Hide me! Mrow! 🙈', 'Scary! Meow meow! 👻', 'Help! Frightened purr! 😰'],
+                soundPrompts: ['frightened cat startled meow', 'scared kitten worried cry', 'nervous feline anxious sounds']
+            },
+            excited: {
+                image: 'cat-excited.png',
+                meows: ['WOW! Meow meow! 🎉', 'Amazing! Purr! ✨', 'So cool! Mrow! 🌟', 'Thrilled meow! 🎊'],
+                soundPrompts: ['excited cat enthusiastic meowing', 'thrilled kitten happy chirps', 'energetic feline celebration sounds']
+            },
+            loving: {
+                image: 'cat-loving.png',
+                meows: ['Love you! Purr 💖', 'Cuddle meow! 🤗', 'Sweet purr purr! 💕', 'Affection mrow! 🥰'],
+                soundPrompts: ['loving cat gentle purring', 'affectionate kitten soft meows', 'tender feline loving sounds']
+            },
+            mischievous: {
+                image: 'cat-mischievous.png',
+                meows: ['Hehe... meow 😏', 'Sneaky mrow! 🤫', 'Trouble time! Purr 😈', 'Naughty meow! 😼'],
+                soundPrompts: ['mischievous cat playful trill', 'sneaky kitten quiet meow', 'naughty feline subtle chirp']
             }
         };
         
@@ -118,19 +138,26 @@ class KittyMeowMachine {
             const randomMeow = moodData.meows[Math.floor(Math.random() * moodData.meows.length)];
             this.showMeowBubble(randomMeow);
             
-            // Generate AI voice
-            const voicePrompt = moodData.voicePrompts[Math.floor(Math.random() * moodData.voicePrompts.length)];
+            // Generate AI sound effect
+            const soundPrompt = moodData.soundPrompts[Math.floor(Math.random() * moodData.soundPrompts.length)];
             
-            const audioResult = await websim.textToSpeech({
-                text: randomMeow.replace(/[^\w\s]/g, ''), // Remove emojis for speech
-                voice: 'en-female'
-            });
+            // Create sound effect based on the prompt
+            const soundBlob = await fetch('/generate-sound', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    prompt: soundPrompt,
+                    duration: 2
+                })
+            }).then(r => r.blob());
+            
+            const audioUrl = URL.createObjectURL(soundBlob);
             
             // Play the generated sound
-            const audio = new Audio(audioResult.url);
+            const audio = new Audio(audioUrl);
             audio.play();
             
-            this.addToHistory(randomMeow, audioResult.url);
+            this.addToHistory(randomMeow, audioUrl);
             
         } catch (error) {
             console.error('Error generating meow:', error);
@@ -185,16 +212,24 @@ class KittyMeowMachine {
             const catMessage = completion.content;
             this.showMeowBubble(catMessage);
             
-            // Generate speech
-            const audioResult = await websim.textToSpeech({
-                text: catMessage.replace(/[^\w\s]/g, ''),
-                voice: 'en-female'
-            });
+            // Generate cat meow sound based on current mood
+            const moodData = this.moodData[this.currentMood];
+            const soundPrompt = moodData.soundPrompts[Math.floor(Math.random() * moodData.soundPrompts.length)];
             
-            const audio = new Audio(audioResult.url);
+            const soundBlob = await fetch('/generate-sound', {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    prompt: soundPrompt,
+                    duration: 2
+                })
+            }).then(r => r.blob());
+            
+            const audioUrl = URL.createObjectURL(soundBlob);
+            const audio = new Audio(audioUrl);
             audio.play();
             
-            this.addToHistory(catMessage, audioResult.url);
+            this.addToHistory(catMessage, audioUrl);
             this.customMessage.value = '';
             
         } catch (error) {
@@ -269,4 +304,3 @@ class KittyMeowMachine {
 document.addEventListener('DOMContentLoaded', () => {
     new KittyMeowMachine();
 });
-
