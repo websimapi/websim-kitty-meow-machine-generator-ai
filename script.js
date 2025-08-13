@@ -1,7 +1,9 @@
-class KittyMeowMachine {
+import confetti from 'canvas-confetti';
+
+class KittyMoodMachine {
     constructor() {
         this.currentMood = 'happy';
-        this.isGenerating = false;
+        this.isLoading = false;
         this.customKitties = {};
         
         // Base moods, never modified
@@ -96,13 +98,13 @@ class KittyMeowMachine {
         // Add bounce animation when mood changes
         this.catImage.style.animation = 'none';
         void this.catImage.offsetWidth; // Trigger reflow
-        this.catImage.style.animation = 'float 3s ease-in-out infinite';
+        this.catImage.style.animation = 'float 3s ease-in-out infinite, fadeIn 0.5s ease-out';
     }
     
     async generateMeow() {
-        if (this.isGenerating) return;
+        if (this.isLoading) return;
         
-        this.isGenerating = true;
+        this.isLoading = true;
         this.setLoading(true);
         this.generateBtn.textContent = '🎵 Generating...';
         
@@ -147,7 +149,7 @@ class KittyMeowMachine {
             this.showMeowBubble('Meow! (Error generating sound) 😿');
         }
         
-        this.isGenerating = false;
+        this.isLoading = false;
         this.setLoading(false);
         this.generateBtn.textContent = '🎵 Generate Meow';
     }
@@ -162,9 +164,9 @@ class KittyMeowMachine {
     }
     
     async createNewKitty() {
-        if (this.isGenerating) return;
+        if (this.isLoading) return;
 
-        this.isGenerating = true;
+        this.isLoading = true;
         this.setLoading(true);
         this.newKittyBtn.textContent = '💖 Finding a kitty...';
         
@@ -205,13 +207,21 @@ class KittyMeowMachine {
             this.renderMoodButtons();
             
             this.selectMood(moodId);
+            
+            // Fun confetti effect!
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
 
         } catch (error) {
             console.error("Error creating new kitty:", error);
             alert("Oh no! Couldn't find a new kitty for you right now. Please try again later. 😿");
         }
 
-        this.isGenerating = false;
+        this.isLoading = false;
         this.setLoading(false);
         this.newKittyBtn.textContent = '💖 Adopt a New Kitty!';
     }
@@ -241,7 +251,7 @@ class KittyMeowMachine {
     
     updateClearButtonVisibility() {
         const hasCustomKitties = Object.keys(this.customKitties).length > 0;
-        this.clearKittiesBtn.style.display = hasCustomKitties ? 'block' : 'none';
+        this.clearKittiesBtn.style.display = hasCustomKitties ? 'inline-block' : 'none';
     }
 
     setLoading(isLoading) {
@@ -309,5 +319,5 @@ class KittyMeowMachine {
 
 // Initialize the app when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new KittyMeowMachine();
+    new KittyMoodMachine();
 });
