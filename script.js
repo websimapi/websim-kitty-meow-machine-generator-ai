@@ -171,15 +171,17 @@ class KittyMoodMachine {
         this.newKittyBtn.textContent = '💖 Finding a kitty...';
         
         try {
+            const existingKittyNames = Object.values(this.moodData).map(data => data.name).join(', ');
+
             const chatCompletion = await websim.chat.completions.create({
                 messages: [
                     {
                         role: "system",
-                        content: `You are a cat character creator. Create a unique, adorable cartoon cat. Respond with JSON containing a short "name" (e.g., "✨ Sparkle") and a "description" (e.g., "A fluffy calico cat wearing a tiny bow tie"). The name should be short and include a relevant emoji.`
+                        content: `You are a cat character creator. Create a unique, adorable cartoon cat. Respond with JSON containing a short "name" (e.g., "✨ Sparkle") and a "description" (e.g., "A fluffy calico cat wearing a tiny bow tie"). The name should be short and include a relevant emoji. Do not create a character similar to the ones that already exist.`
                     },
                     {
                         role: "user",
-                        content: "Create a new cat character for me."
+                        content: `Create a new cat character for me. Existing characters are: ${existingKittyNames}`
                     }
                 ],
                 json: true,

@@ -381,16 +381,16 @@ header p {
     }
     
     .mood-buttons {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: 1fr;
+        gap: 10px;
         overflow-y: auto;
         padding-right: 5px; /* for scrollbar */
     }
     
     .mood-btn {
         width: 100%;
-        padding: 10px;
-        font-size: 0.9rem;
+        padding: 12px;
+        font-size: 1rem;
     }
 
     .new-kitty-controls {
