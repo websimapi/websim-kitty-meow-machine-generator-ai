@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 Kitty Meow Machine Generator AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐱 Kitty Meow Machine</h1>
+            <p>AI-Powered Purr-fect Meow Generator</p>
+        </header>
+
+        <div class="cat-display">
+            <div class="cat-container">
+                <img id="catImage" src="cat-happy.png" alt="Cute cat" class="cat-image">
+                <div class="speech-bubble" id="speechBubble">
+                    <span id="meowText">Meow! 🐾</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="mood-selector">
+                <h3>Select Kitty's Mood:</h3>
+                <div class="mood-buttons">
+                    <button class="mood-btn active" data-mood="happy">😸 Happy</button>
+                    <button class="mood-btn" data-mood="angry">😾 Grumpy</button>
+                    <button class="mood-btn" data-mood="sleepy">😴 Sleepy</button>
+                    <button class="mood-btn" data-mood="hungry">🍽️ Hungry</button>
+                    <button class="mood-btn" data-mood="playful">🎾 Playful</button>
+                    <button class="mood-btn" data-mood="curious">🔍 Curious</button>
+                </div>
+            </div>
+
+            <div class="generation-controls">
+                <button id="generateMeow" class="generate-btn">
+                    🎵 Generate Meow
+                </button>
+                <button id="surpriseMe" class="surprise-btn">
+                    ✨ Surprise Me!
+                </button>
+            </div>
+
+            <div class="custom-meow">
+                <h3>Custom Meow Message:</h3>
+                <input type="text" id="customMessage" placeholder="What should kitty say? (e.g., 'I want treats!')">
+                <button id="customMeowBtn">🗣️ Make Kitty Say It</button>
+            </div>
+        </div>
+
+        <div class="meow-history">
+            <h3>Recent Meows:</h3>
+            <div id="historyContainer" class="history-list"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+
