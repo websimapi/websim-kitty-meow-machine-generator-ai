@@ -3,6 +3,8 @@ class KittyMeowMachine {
         this.currentMood = 'happy';
         this.meowHistory = [];
         this.isGenerating = false;
+        this.isCustomCat = false;
+        this.currentCatDescription = 'An adorable happy orange cat';
         
         this.moodData = {
             happy: {
@@ -68,8 +70,7 @@ class KittyMeowMachine {
         this.meowText = document.getElementById('meowText');
         this.generateBtn = document.getElementById('generateMeow');
         this.surpriseBtn = document.getElementById('surpriseMe');
-        this.customMessage = document.getElementById('customMessage');
-        this.customMeowBtn = document.getElementById('customMeowBtn');
+        this.newKittyBtn = document.getElementById('newKittyBtn');
         this.historyContainer = document.getElementById('historyContainer');
         this.moodButtons = document.querySelectorAll('.mood-btn');
     }
@@ -88,15 +89,9 @@ class KittyMeowMachine {
         this.surpriseBtn.addEventListener('click', () => {
             this.surpriseMe();
         });
-        
-        this.customMeowBtn.addEventListener('click', () => {
-            this.generateCustomMeow();
-        });
-        
-        this.customMessage.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.generateCustomMeow();
-            }
+
+        this.newKittyBtn.addEventListener('click', () => {
+            this.createNewKitty();
         });
     }
     
@@ -115,8 +110,10 @@ class KittyMeowMachine {
     }
     
     updateCatDisplay() {
-        const moodData = this.moodData[this.currentMood];
-        this.catImage.src = moodData.image;
+        if (!this.isCustomCat) {
+            const moodData = this.moodData[this.currentMood];
+            this.catImage.src = moodData.image;
+        }
         
         // Add bounce animation when mood changes
         this.catImage.style.animation = 'none';
@@ -134,30 +131,38 @@ class KittyMeowMachine {
         try {
             const moodData = this.moodData[this.currentMood];
             
-            // Show random text meow immediately
-            const randomMeow = moodData.meows[Math.floor(Math.random() * moodData.meows.length)];
-            this.showMeowBubble(randomMeow);
+            // Generate AI meow text
+            const completion = await websim.chat.completions.create({
+                messages: [
+                    {
+                        role: "system",
+                        content: `You are a cat. Generate a short, cute meow or cat-like phrase that fits the specified mood and cat description. Add cat emojis. Keep it under 50 characters. The user will provide the mood and a description of you.`
+                    },
+                    {
+                        role: "user",
+                        content: `My mood is: ${this.currentMood}. My description is: ${this.currentCatDescription}`
+                    }
+                ]
+            });
+
+            const aiMeow = completion.content;
+            this.showMeowBubble(aiMeow);
             
             // Generate AI sound effect
             const soundPrompt = moodData.soundPrompts[Math.floor(Math.random() * moodData.soundPrompts.length)];
             
-            // Create sound effect based on the prompt
-            const soundBlob = await fetch('/generate-sound', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    prompt: soundPrompt,
-                    duration: 2
-                })
-            }).then(r => r.blob());
-            
-            const audioUrl = URL.createObjectURL(soundBlob);
+            const soundResult = await websim.textToSpeech({
+              text: "meow",
+              prompt: soundPrompt
+            });
+
+            const audioUrl = soundResult.url;
             
             // Play the generated sound
             const audio = new Audio(audioUrl);
             audio.play();
             
-            this.addToHistory(randomMeow, audioUrl);
+            this.addToHistory(aiMeow, audioUrl);
             
         } catch (error) {
             console.error('Error generating meow:', error);
@@ -180,65 +185,66 @@ class KittyMeowMachine {
         }, 500);
     }
     
-    async generateCustomMeow() {
-        const message = this.customMessage.value.trim();
-        if (!message) return;
-        
+    async createNewKitty() {
         if (this.isGenerating) return;
-        
+
         this.isGenerating = true;
-        this.customMeowBtn.textContent = '🗣️ Generating...';
-        
+        this.newKittyBtn.textContent = '💖 Finding a kitty...';
+        this.newKittyBtn.disabled = true;
+        this.setLoading(true);
+
         try {
-            // Use AI to create a cat-like version of the message
-            const completion = await websim.chat.completions.create({
+            this.showMeowBubble("Let's find you a new friend! 🐾");
+
+            const chatCompletion = await websim.chat.completions.create({
                 messages: [
                     {
                         role: "system",
-                        content: `You are a cat translator. Convert human messages into cute cat-speak while maintaining the meaning. 
-                        Add appropriate cat emojis. Keep it playful and adorable. Maximum 50 characters.
-                        Examples:
-                        "I'm hungry" -> "Meow! Want noms! 🍽️😸"
-                        "Hello" -> "Mrow hello! 🐾"
-                        "I love you" -> "Purr love you! 💕🐱"`
+                        content: "You are a cat character creator. Describe a unique, adorable cartoon cat. Be concise and creative. Just the description, no preamble. E.g., 'A fluffy calico cat wearing a tiny bow tie, looking curious.' or 'A chubby tabby cat with a star on its forehead.'"
                     },
                     {
                         role: "user",
-                        content: message
+                        content: "Create a new cat character for me."
                     }
-                ]
+                ],
             });
-            
-            const catMessage = completion.content;
-            this.showMeowBubble(catMessage);
-            
-            // Generate cat meow sound based on current mood
-            const moodData = this.moodData[this.currentMood];
-            const soundPrompt = moodData.soundPrompts[Math.floor(Math.random() * moodData.soundPrompts.length)];
-            
-            const soundBlob = await fetch('/generate-sound', {
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    prompt: soundPrompt,
-                    duration: 2
-                })
-            }).then(r => r.blob());
-            
-            const audioUrl = URL.createObjectURL(soundBlob);
-            const audio = new Audio(audioUrl);
-            audio.play();
-            
-            this.addToHistory(catMessage, audioUrl);
-            this.customMessage.value = '';
-            
+            const catDescription = chatCompletion.content;
+            this.currentCatDescription = catDescription;
+
+            const imagePrompt = `${catDescription}, happy expression, anime/kawaii style, cute, simple background`;
+
+            const imageResult = await websim.imageGen({
+                prompt: imagePrompt,
+                transparent: true,
+                aspect: 'square'
+            });
+
+            this.catImage.src = imageResult.url;
+            this.isCustomCat = true;
+            this.showMeowBubble("I'm here! Let's play! ✨");
+            this.selectMood('happy');
+
         } catch (error) {
-            console.error('Error generating custom meow:', error);
-            this.showMeowBubble('Meow! (Error) 😿');
+            console.error("Error creating new kitty:", error);
+            this.showMeowBubble("Oh no! Couldn't find a kitty. 😿");
         }
-        
+
         this.isGenerating = false;
-        this.customMeowBtn.textContent = '🗣️ Make Kitty Say It';
+        this.newKittyBtn.textContent = '💖 Adopt a New Kitty!';
+        this.newKittyBtn.disabled = false;
+        this.setLoading(false);
+    }
+
+    setLoading(isLoading) {
+        if (isLoading) {
+            this.generateBtn.disabled = true;
+            this.surpriseBtn.disabled = true;
+            this.newKittyBtn.disabled = true;
+        } else {
+            this.generateBtn.disabled = false;
+            this.surpriseBtn.disabled = false;
+            this.newKittyBtn.disabled = false;
+        }
     }
     
     showMeowBubble(text) {
