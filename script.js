@@ -1,22 +1,21 @@
 class KittyMeowMachine {
     constructor() {
         this.currentMood = 'happy';
-        this.meowHistory = [];
         this.isGenerating = false;
         this.customKitties = {};
         
         // Base moods, never modified
         this.baseMoodData = {
-            happy: { name: '😸 Happy', image: 'cat-happy.png', description: 'An adorable happy orange cat', meows: ['Meow! 😸', 'Purr meow! 🐾', 'Mrow mrow! ✨', 'Happy meow! 💕'], soundPrompts: ['happy cat purring and meowing', 'content kitten gentle meow', 'joyful cat soft purr'] },
-            angry: { name: '😾 Grumpy', image: 'cat-angry.png', description: 'A grumpy orange cat', meows: ['HISS! 😾', 'Grrr meow! 💢', 'Angry mrow! 🔥', 'Mad cat sounds! 😤'], soundPrompts: ['angry cat hissing loudly', 'grumpy cat growling and yowling', 'annoyed feline angry meow'] },
-            sleepy: { name: '😴 Sleepy', image: 'cat-sleepy.png', description: 'A sleepy orange cat', meows: ['Yawn... meow 😴', 'Sleepy purr... 💤', 'Zzz... mrow 🌙', 'Drowsy meow... ☁️'], soundPrompts: ['sleepy cat soft yawn and purr', 'tired kitten gentle meow', 'drowsy feline quiet purr'] },
-            hungry: { name: '🍽️ Hungry', image: 'cat-hungry.png', description: 'A hungry orange cat', meows: ['FEED ME! 🍽️', 'Hungry meow! 🐟', 'Where food? Mrow! 🥫', 'Nom nom meow! 🍖'], soundPrompts: ['demanding hungry cat loud meow', 'begging kitten insistent meowing', 'food-wanting cat persistent calls'] },
-            playful: { name: '🎾 Playful', image: 'cat-playful.png', description: 'A playful orange cat', meows: ['Play time! 🎾', 'Zoom zoom meow! 💨', 'Catch me! Mrow! 🏃‍♂️', 'Bouncy meow! 🎈'], soundPrompts: ['playful kitten excited chirping', 'energetic cat trilling sounds', 'active feline playful meows'] },
-            curious: { name: '🔍 Curious', image: 'cat-curious.png', description: 'A curious orange cat', meows: ['What\'s that? 🔍', 'Interested mrow? 🤔', 'Tell me more! Meow 📚', 'Curious purr? 💭'], soundPrompts: ['inquisitive cat questioning trill', 'curious kitten soft chirp', 'interested feline gentle meow'] },
-            scared: { name: '😨 Scared', image: 'cat-scared.png', description: 'A scared orange cat', meows: ['Eek! Meow! 😨', 'Hide me! Mrow! 🙈', 'Scary! Meow meow! 👻', 'Help! Frightened purr! 😰'], soundPrompts: ['frightened cat startled meow', 'scared kitten worried cry', 'nervous feline anxious sounds'] },
-            excited: { name: '🎉 Excited', image: 'cat-excited.png', description: 'An excited orange cat', meows: ['WOW! Meow meow! 🎉', 'Amazing! Purr! ✨', 'So cool! Mrow! 🌟', 'Thrilled meow! 🎊'], soundPrompts: ['excited cat enthusiastic meowing', 'thrilled kitten happy chirps', 'energetic feline celebration sounds'] },
-            loving: { name: '💖 Loving', image: 'cat-loving.png', description: 'A loving orange cat', meows: ['Love you! Purr 💖', 'Cuddle meow! 🤗', 'Sweet purr purr! 💕', 'Affection mrow! 🥰'], soundPrompts: ['loving cat gentle purring', 'affectionate kitten soft meows', 'tender feline loving sounds'] },
-            mischievous: { name: '😈 Mischievous', image: 'cat-mischievous.png', description: 'A mischievous orange cat', meows: ['Hehe... meow 😏', 'Sneaky mrow! 🤫', 'Trouble time! Purr 😈', 'Naughty meow! 😼'], soundPrompts: ['mischievous cat playful trill', 'sneaky kitten quiet meow', 'naughty feline subtle chirp'] }
+            happy: { name: '😸 Happy', image: 'cat-happy.png', description: 'An adorable happy orange cat' },
+            angry: { name: '😾 Grumpy', image: 'cat-angry.png', description: 'A grumpy orange cat' },
+            sleepy: { name: '😴 Sleepy', image: 'cat-sleepy.png', description: 'A sleepy orange cat' },
+            hungry: { name: '🍽️ Hungry', image: 'cat-hungry.png', description: 'A hungry orange cat' },
+            playful: { name: '🎾 Playful', image: 'cat-playful.png', description: 'A playful orange cat' },
+            curious: { name: '🔍 Curious', image: 'cat-curious.png', description: 'A curious orange cat' },
+            scared: { name: '😨 Scared', image: 'cat-scared.png', description: 'A scared orange cat' },
+            excited: { name: '🎉 Excited', image: 'cat-excited.png', description: 'An excited orange cat' },
+            loving: { name: '💖 Loving', image: 'cat-loving.png', description: 'A loving orange cat' },
+            mischievous: { name: '😈 Mischievous', image: 'cat-mischievous.png', description: 'A mischievous orange cat' }
         };
 
         this.moodData = { ...this.baseMoodData }; // Combined data
@@ -31,12 +30,7 @@ class KittyMeowMachine {
     
     initializeElements() {
         this.catImage = document.getElementById('catImage');
-        this.speechBubble = document.getElementById('speechBubble');
-        this.meowText = document.getElementById('meowText');
-        this.generateBtn = document.getElementById('generateMeow');
-        this.surpriseBtn = document.getElementById('surpriseMe');
         this.newKittyBtn = document.getElementById('newKittyBtn');
-        this.historyContainer = document.getElementById('historyContainer');
         this.moodButtonsContainer = document.querySelector('.mood-buttons');
         this.clearKittiesBtn = document.getElementById('clearKittiesBtn');
     }
@@ -48,14 +42,6 @@ class KittyMeowMachine {
             }
         });
         
-        this.generateBtn.addEventListener('click', () => {
-            this.generateMeow();
-        });
-        
-        this.surpriseBtn.addEventListener('click', () => {
-            this.surpriseMe();
-        });
-
         this.newKittyBtn.addEventListener('click', () => {
             this.createNewKitty();
         });
@@ -183,8 +169,6 @@ class KittyMeowMachine {
         this.newKittyBtn.textContent = '💖 Finding a kitty...';
         
         try {
-            this.showMeowBubble("Let's find you a new friend! 🐾");
-
             const chatCompletion = await websim.chat.completions.create({
                 messages: [
                     {
@@ -213,7 +197,6 @@ class KittyMeowMachine {
                 image: imageResult.url,
                 description: kittyData.description,
                 isCustom: true,
-                soundPrompts: this.baseMoodData.happy.soundPrompts, // Inherit sounds
             };
 
             this.customKitties[moodId] = newKitty;
@@ -221,12 +204,11 @@ class KittyMeowMachine {
             this.saveCustomKitties();
             this.renderMoodButtons();
             
-            this.showMeowBubble("I'm here! Let's play! ✨");
             this.selectMood(moodId);
 
         } catch (error) {
             console.error("Error creating new kitty:", error);
-            this.showMeowBubble("Oh no! Couldn't find a kitty. 😿");
+            alert("Oh no! Couldn't find a new kitty for you right now. Please try again later. 😿");
         }
 
         this.isGenerating = false;
@@ -255,7 +237,6 @@ class KittyMeowMachine {
         this.renderMoodButtons();
         this.selectMood('happy');
         this.updateClearButtonVisibility();
-        this.showMeowBubble("All adopted kitties have gone home. 🐾");
     }
     
     updateClearButtonVisibility() {
@@ -264,15 +245,7 @@ class KittyMeowMachine {
     }
 
     setLoading(isLoading) {
-        this.generateBtn.disabled = isLoading;
-        this.surpriseBtn.disabled = isLoading;
         this.newKittyBtn.disabled = isLoading;
-        
-        if (isLoading) {
-            this.generateBtn.textContent = '🎵 Generating...';
-        } else {
-            this.generateBtn.textContent = '🎵 Generate Meow';
-        }
     }
     
     showMeowBubble(text) {
